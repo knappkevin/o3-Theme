@@ -5,6 +5,9 @@
 ### Added
 - Search suggest dropdown in the header search (`tpl/widget/header/search.tpl`, `build/js/widget/oxsearchsuggest.js`, `build/scss/widget/header/_search.scss`) — debounced JSON lookup against the `searchsuggest` controller, keyboard-navigable result list with thumbnail, title and price. Requires shop-ce with the `searchsuggest` endpoint (shop-ce#219); the form degrades to a plain search submit on older shops, when the suggest endpoint is disabled and without JavaScript.
 
+### Changed
+- The production build no longer runs PurgeCSS by default. O3-Theme is a base for child themes, modules and CMS content, which add classes at runtime that a static scan cannot see; purging silently dropped them from the committed `main.min.css` used by productive shops, while dev shops (unpurged `main.css`) looked fine. The committed `main.min.css` is now the full, unpurged build (~317 KB / ~47 KB gzip). PurgeCSS remains available as an opt-in (`npx gulp prod --purge` or `npm run build:purge`, plus the `PURGE=1` environment variable) with the existing safelist.
+
 ### Fixed
 - Search suggest dropdown was unstyled in productive mode: the committed `out/o3-theme/src/css/main.min.css` was stale and did not contain the `.search-suggest-*` rules, so productive shops (which load `main.min.css`) rendered the dropdown as an unstyled inline block while dev/demo (which load the unpurged `main.css`) worked. The committed build now includes the rules.
 - Remove overly narrow `pattern` from password fields in `forgotpwd_change_pwd.tpl` and `user_password.tpl`; the HTML5 pattern only allowed 7 special characters (`@$!%*?&`) while `validate.js` accepts 29, causing valid passwords to be rejected at submit and the confirm field to falsely show "passwords do not match" (#225)
