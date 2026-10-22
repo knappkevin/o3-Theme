@@ -8,7 +8,7 @@
 ### Key Features
 - Bootstrap 5.3.8
 - Custom build process (Gulp)
-- PurgeCSS for optimized CSS output
+- Optional PurgeCSS (standardmäßig deaktiviert)
 - SplideJS for sliders
 
 ## 2. Installation
@@ -132,7 +132,7 @@ Run these commands from the theme root directory:
 
 | Command | Description | Use Case |
 |---------|-------------|----------|
-| `gulp` | Production build | Minified JS/CSS with PurgeCSS |
+| `gulp` | Production build | Minified JS/CSS (PurgeCSS standardmäßig deaktiviert) |
 | `gulp dev` | Development watcher | Auto-rebuild on changes + TMP cleanup |
 
 ### Development Workflow
@@ -159,20 +159,31 @@ gulp
 
 This will:
 - Minify JavaScript and CSS
-- Remove unused CSS with PurgeCSS
 - Optimize assets for production
 
-### PurgeCSS Safelist
+PurgeCSS ist **standardmäßig deaktiviert**: O3-Theme ist die Basis für
+Child-Themes, Module und CMS-Inhalte, die Klassen erst zur Laufzeit erzeugen.
+Ein statischer Scan kann diese nicht sehen, daher würden sie im Produktivmodus
+stillschweigend entfernt (im Dev-Modus fällt es nicht auf, weil dort das
+ungepurged `main.css` geladen wird). Optional aktivieren:
 
-PurgeCSS removes unused CSS classes. If you dynamically generate class names in JavaScript or templates, add them to the safelist.
+```bash
+npx gulp prod --purge    # oder: npm run build:purge — funktioniert unter Windows, macOS und Linux
+```
 
-**Example dynamic classes:**
+### Optional PurgeCSS (opt-in)
+
+Wenn PurgeCSS aktiviert wird, entfernt es ungenutzte CSS-Klassen. Dynamisch
+erzeugte Klassennamen aus JavaScript oder Templates müssen dann in die
+Safelist aufgenommen werden.
+
+**Beispiel dynamischer Klassen:**
 ```smarty
 {* Template with dynamic class *}
 <div class="[{$type}]-view"></div>
 ```
 
-**Add to safelist in `gulpfile.js`:**
+**Safelist in `gulpfile.js` ergänzen:**
 ```javascript
 safelist: [
     'grid-view',    // Add your dynamic classes here
@@ -181,7 +192,7 @@ safelist: [
 ]
 ```
 
-**Location:** Line ~81 in `gulpfile.js` in the PurgeCSS configuration.
+**Ort:** PurgeCSS-Konfiguration in `gulpfile.js` (nur bei `--purge` aktiv).
 
 ---
 
